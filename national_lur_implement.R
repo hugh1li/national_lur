@@ -9,7 +9,10 @@ library(DAAG)
 
 LUR_input <- read_csv("qing_national_lur_input.csv")
 LUR_input_01 <- LUR_input %>% select(-qing_ID) 
-LUR_input_f = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
+LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
+# remove vars with more than half zero
+zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
+LUR_input_f = LUR_input_02[zero_filter < 0.5]
 ignore_list <- names(LUR_input_f)[1:482]
 sx <- LUR_input_f
 
