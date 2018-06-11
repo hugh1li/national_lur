@@ -108,6 +108,17 @@ sqrt(mean(M_chi^2))
 1.02
 
 
+
+# check zero fraction -----------------------------------------------------
+
+zerocheck <- zero_filter %>% as.data.frame(row.names = names(zero_filter)) %>% rownames_to_column(var = "covar")
+names(zero_check) <- c('covar', "values") # doesnot work?
+zerocheck %>% filter(covar == 'tl_s00750') # 0.36
+zerocheck %>% filter(covar == 'ndvi_winter_a00250') # 0
+zerocheck %>% filter(covar == 'll_a3_s00300') # 0.03
+zerocheck %>% filter(covar == 'll_a1_s03000') # 0.01
+zerocheck %>% filter(covar == 'tl_s05000') # 0
+
 # previous zeros truck and road boxplot --------------------------------------------------
 ind_plot <- LUR_input_02 %>% select(tl_s00300, ll_a1_s01500, ll_a3_s00300, tl_s00150, ll_a1_s01000, tl_s05000)
 ind_plot %>% gather() %>% ggplot() + geom_boxplot(aes(x = key, y = value)) 
