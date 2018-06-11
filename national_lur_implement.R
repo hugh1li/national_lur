@@ -13,19 +13,20 @@ LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 # remove vars with more than half zero
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
 LUR_input_f = LUR_input_02[zero_filter < 0.5]
-ignore_list <- names(LUR_input_f)[1:482]
+ignore_list <- names(LUR_input_f)[1:321]
 sx <- LUR_input_f
 
 # COA ---------------------------------------------------------------------
 # not 298, coz duplicates removal code change order already
 
-COA <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 483, special = ignore_list)
+COA <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 322, special = ignore_list)
 
 # validation 
-COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + tl_s00300 + ll_a1_s01500 + ll_a3_s00500 + intersect_a1_a2_s01000 + lu_stream_p00300"), sx)
+COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + elev_1k_at_elev + lu_forest_p03000 + lu_stream_p00300 + tl_s00750 + ll_a1_s01500 + lu_oth_urban_p00750 + lu_comm_p03000 + intersect_a1_a1_s03000 + imp_a01000 + pop_s01000 + ndvi_winter_a07500 + ll_a3_s00500 + tl_s15000"), sx)
 
-COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + tl_s00300 + ll_a1_s01500  "), sx)
-r2 0.63
+COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + elev_1k_at_elev + lu_forest_p03000 + lu_stream_p00300 + tl_s00750  "), sx)
+summary(COA_lm)
+r2 0.56
 
 # adj 0.62
 plot(COA_lm, which = 4)
@@ -37,62 +38,29 @@ car::vif(COA_lm)
 # LOOCV R2
 loocv_COA <- cv.lm(COA_lm$model, COA_lm, m = 70, legend.pos = "topright")
 cor(loocv_COA$COA,loocv_COA$cvpred)**2
-0.59
+0.47
 
 # mean studentized prediction residuals (sd used n-1)
 M_COA<-rstudent(COA_lm)
 mean(M_COA)
-0.00596
+-0.00218
 # root mean square of studentized
 sqrt(mean(M_COA^2))
-1.01
-
-
-
-
-
-# COA #2 ------------------------------------------------------------------
-
-COA <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 483, special = ignore_list, exclude = c('tl_s00150', 'tl_s00300'))
-
-# validation 
-COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + elev_1k_at_elev + ll_a1_s00300 + lu_resi_p01500 + lu_stream_p00300 + lu_comm_p03000 + ndvi_q75_a02500"), sx)
-
-COA_lm <- lm(formula("COA ~  + ndvi_winter_a00250 + elev_1k_at_elev + ll_a1_s00300 + lu_resi_p01500 + lu_stream_p00300 + lu_comm_p03000"), sx)
-
-# adj 0.62
-plot(COA_lm, which = 4)
-car::vif(COA_lm)
-
-# moran's I
-# todo
-
-# LOOCV R2
-loocv_COA <- cv.lm(COA_lm$model, COA_lm, m = 70, legend.pos = "topright")
-cor(loocv_COA$COA,loocv_COA$cvpred)**2
-0.59
-
-# mean studentized prediction residuals (sd used n-1)
-M_COA<-rstudent(COA_lm)
-mean(M_COA)
-0.00596
-# root mean square of studentized
-sqrt(mean(M_COA^2))
-1.01
-
-
-
+1.02
 
 
 # HOA ---------------------------------------------------------------------
 
-HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 483, special = ignore_list)
+HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 322, special = ignore_list)
 
 # validation 
 
-HOA_lm <- lm(formula("HOA ~  + ll_a3_s00300 + tl_s00150 + lu_transport_p00750 + elev_elevation + em_CO_s30000 + lu_comm_p00050"), sx)
+HOA_lm <- lm(formula("HOA ~  + ll_a3_s00300 + lu_transport_p00750 + ll_a1_s03000 + em_CO_s30000 + lu_resi_p00400 + lu_mix_urban_p15000 + lu_industrial_p03000 + lu_resi_p01000 + em_CO_s03000 + lu_industrial_p01500 + ll_a3_s03000 + satno2_2013_2015 + rlu_dev_med_p00100"), sx)
 summary(HOA_lm)
 
+HOA_lm <- lm(formula("HOA ~  + ll_a3_s00300 + lu_transport_p00750 + ll_a1_s03000  "), sx)
+summary(HOA_lm)
+0.50 and adj r2 0.47
 plot(HOA_lm, which = 4)
 car::vif(HOA_lm)
 
@@ -102,21 +70,20 @@ car::vif(HOA_lm)
 # LOOCV R2
 loocv_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=70, legend.pos = "topright")
 cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
-0.61
+0.40
 
 # mean studentized prediction residuals (sd used n-1)
 M_HOA<-rstudent(HOA_lm)
 mean(M_HOA)
-0.0102
+0.0158
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
-1.04
+1.06
 
 
 # chi ---------------------------------------------------------------------
 
-chi <- make_lur(dat1 = LUR_input_f, response = "chi", dep_col = 483, special = ignore_list) 
-
+chi <- make_lur(dat1 = LUR_input_f, response = "chi", dep_col = 322, special = ignore_list) 
 
 chi_lm <- lm(formula("chi ~  + ll_a1_s01000 + m_to_ry + tl_s05000  "), sx)
 summary(chi_lm)
@@ -141,8 +108,8 @@ sqrt(mean(M_chi^2))
 1.02
 
 
-# truck and road boxplot --------------------------------------------------
-ind_plot <- LUR_input_f %>% select(tl_s00300, ll_a1_s01500, ll_a3_s00300, tl_s00150, ll_a1_s01000, tl_s05000)
+# previous zeros truck and road boxplot --------------------------------------------------
+ind_plot <- LUR_input_02 %>% select(tl_s00300, ll_a1_s01500, ll_a3_s00300, tl_s00150, ll_a1_s01000, tl_s05000)
 ind_plot %>% gather() %>% ggplot() + geom_boxplot(aes(x = key, y = value)) 
 
 ggplot(ind_plot) + geom_boxplot(aes(x = 1, y = tl_s00300)) + ggpubr::theme_pubr()
