@@ -1,0 +1,1 @@
+This national LUR is for qing's model based on national LUR covariates, not my pittsburgh covariates.
